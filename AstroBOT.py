@@ -1,9 +1,12 @@
 # -*- coding: UTF-8 -*-
 
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, RegexHandler
-from telegram import ReplyKeyboardMarkup, ReplyMarkup, ReplyKeyboardRemove, User, Update
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, RegexHandler, CallbackQueryHandler
+from telegram import ReplyKeyboardMarkup, ReplyMarkup, ReplyKeyboardRemove, User, Update, InlineKeyboardButton, InlineKeyboardMarkup
+
 
 import emoji
+
+import sqlite3
 
 import requests
 import json
@@ -177,11 +180,65 @@ def OCR(bot, update):
 
 def contact(bot, update):
 
+
     id_usuario = update.message.chat_id
 
     bot.sendMessage(chat_id = id_usuario, text = "Aqui se encuentra los contactos")
+    connection = sqlite3.connect('database.db')
+    cursor = connection.cursor()
+
+    cursor.execute('SELECT Name FROM {table}'.format(table='Contact'))
+    All_Names = cursor.fetchall()
+    options = []
+    for name in All_Names:
+        print(name)
+        options.append([InlineKeyboardButton(name[0], callback_data=name[0])])
+
+    keyboard = options
+    reply_markup = InlineKeyboardMarkup(keyboard)
+
+    update.message.reply_text('Please choose:', reply_markup=reply_markup)
 
     print("\n")
+
+
+def build_menu(buttons, n_cols, header_buttons=None, footer_buttons=None):
+
+    bot.sendMessage(chat_id=id_usuario, text="¡1!")
+
+    menu = [buttons[i:i + n_cols] for i in range(0, len(buttons), n_cols)]
+
+    if header_buttons:
+        menu.insert(0, header_buttons)
+
+    if footer_buttons:
+        menu.append(footer_buttons)
+
+    bot.sendMessage(chat_id=id_usuario, text="¡2!")
+
+    return menu
+
+def button(bot, update):
+    
+    contacto=''
+    expediente = ''
+    query = update.callback_query
+    print(query.data)
+    connection = sqlite3.connect('database.db')
+    cursor = connection.cursor()
+    cursor.execute('SELECT Contact,Expediente FROM Contact WHERE Name LIKE {}'.format(query.data))
+    
+    data = cursor.fetchall()
+    for dot in data:
+
+        contact = dot[0]
+        expediente = dot[1]
+    print (contacto,expediente)
+
+
+    bot.edit_message_text(text="Contacto: {}".format(contacto)
+                          + '\n' + "Expediente Medico: {}".format(expediente)+'\n', chat_id=query.message.chat_id, message_id=query.message.message_id)
+
 
 def bye(bot, update):
 
@@ -212,6 +269,7 @@ updater.dispatcher.add_handler(RegexHandler("Optical Character Recognition", OCR
 updater.dispatcher.add_handler(RegexHandler("Contacto",contact))
 updater.dispatcher.add_handler(RegexHandler("Chao", bye))
 
+updater.dispatcher.add_handler(CallbackQueryHandler(button))
 listener_handler = MessageHandler(Filters.text, listener)
 updater.dispatcher.add_handler(listener_handler)
 
