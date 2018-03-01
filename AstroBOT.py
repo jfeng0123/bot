@@ -220,24 +220,23 @@ def build_menu(buttons, n_cols, header_buttons=None, footer_buttons=None):
 
 def button(bot, update):
     
-    contacto=''
-    expediente = ''
+   
     query = update.callback_query
-    print(query.data)
+    print("data: "+query.data)
+
+    queryDat = query.data
+    print("type "+type(queryDat))
     connection = sqlite3.connect('database.db')
     cursor = connection.cursor()
-    cursor.execute('SELECT Contact,Expediente FROM Contact WHERE Name LIKE {}'.format(query.data))
+    cursor.execute('SELECT Contact,Expediente FROM Contact WHERE Name LIKE "{}"'.format((queryDat)))
     
-    data = cursor.fetchall()
-    for dot in data:
-
-        contact = dot[0]
-        expediente = dot[1]
-    print (contacto,expediente)
+    data = cursor.fetchone()
+    contact = data[0]
+    expediente = data[1]
+    
 
 
-    bot.edit_message_text(text="Contacto: {}".format(contacto)
-                          + '\n' + "Expediente Medico: {}".format(expediente)+'\n', chat_id=query.message.chat_id, message_id=query.message.message_id)
+    bot.edit_message_text(text="Contacto: \n    {cont} \nExpediente Medico: \n    {exp} \n".format(cont = contact, exp = expediente), chat_id=query.message.chat_id, message_id=query.message.message_id)
 
 
 def bye(bot, update):
