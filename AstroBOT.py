@@ -225,7 +225,7 @@ def button(bot, update):
     print("data: "+query.data)
 
     queryDat = query.data
-    print("type "+type(queryDat))
+ #  print("type "+type(queryDat))
     connection = sqlite3.connect('database.db')
     cursor = connection.cursor()
     cursor.execute('SELECT Contact,Expediente FROM Contact WHERE Name LIKE "{}"'.format((queryDat)))
