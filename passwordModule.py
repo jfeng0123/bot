@@ -74,23 +74,6 @@ def done(bot, update):
 
     update.message.reply_text("Ya ha sido agregado men ("+str(user.first_name)+")")
 
-
-#def build_menu(buttons, n_cols, header_buttons=None, footer_buttons=None):
-
-#    bot.sendMessage(chat_id= id_usuario, text= "¡1!")
-    
-#    menu = [buttons[i:i + n_cols] for i in range(0, len(buttons), n_cols)]
-    
-#    if header_buttons:
-#        menu.insert(0, header_buttons)
-        
-#    if footer_buttons:
-#        menu.append(footer_buttons)
-
-#    bot.sendMessage(chat_id= id_usuario, text= "¡2!")
-        
-#    return menu
-
     
 #Clasificadores
 
