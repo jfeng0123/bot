@@ -28,12 +28,37 @@ def inicio(bot, update):
     id_usuario = update.message.chat_id
     user = update.message.from_user
 
-    teclado = [["Un saludo al bot"], ["Contacto"+emoji.emojize(':v:',  use_aliases=True)], ["¿Y cómo estuvo su dia?", "¿Cómo hizo esto?"],  [
-        "No hace nada", "Algo interesante"], ["Optical Character Recognition", "Chao"]]
-    reply_markup = ReplyKeyboardMarkup(teclado, resize_keyboard=True)
+    connection = sqlite3.connect('database.db')
+    cursor = connection.cursor()
 
-    bot.sendMessage(chat_id= id_usuario, text= "¡Hola!"+" "+user.first_name+" (Si ocupás ayuda presiona \help)\n\nMarque una opción del teclado: ", reply_markup=reply_markup)
+    cursor.execute('SELECT ID FROM {table}'.format(table='WhiteList'))
+    All_Names = cursor.fetchall()
+    WhiteList = []
+    for name in All_Names:
+        print(name)
+        WhiteList.append(name)
+    print(WhiteList)
+    if id_usuario in WhiteList:
+        teclado = [["Un saludo al bot"], ["Contacto"+emoji.emojize(':v:',  use_aliases=True)], ["¿Y cómo estuvo su dia?", "¿Cómo hizo esto?"],  [
+            "No hace nada", "Algo interesante"], ["Optical Character Recognition", "Chao"]]
+        reply_markup = ReplyKeyboardMarkup(teclado, resize_keyboard=True)
 
+        bot.sendMessage(chat_id=id_usuario, text="¡Hola!"+" "+user.first_name +
+                    " (Si ocupás ayuda presiona \help)\n\nMarque una opción del teclado: ", reply_markup=reply_markup)
+    
+    else:
+        teclado = []
+        bot.sendMessage(chat_id=id_usuario, text="Sorry, unauthorized access denied for you: "+str(user.first_name))
+        bot.sendMessage(parse_mode = 'HTML', chat_id= id_usuario, text= "Unless you have some secret <b>password</b> ...")
+
+        ##password = "soyastroteco"
+
+        updater.dispatcher.add_handler(RegexHandler("soyastroteco", password)) ## Escucha la contraseña
+
+
+
+
+    
     #bot.sendMessage(chat_id=id_usuario, text= "Marque una opción del teclado: ", reply_markup=reply_markup)
 
     print("\n")
@@ -218,6 +243,22 @@ def build_menu(buttons, n_cols, header_buttons=None, footer_buttons=None):
 
     return menu
 
+
+def password(bot, update):
+    id_usuario = update.message.chat_id
+    user = update.message.from_user
+    connection = sqlite3.connect('database.db')
+    cursor = connection.cursor()
+    cursor.execute('insert into WhiteList values ({ID})'.format(ID=id_usuario))
+    connection.commit()
+    connection.close()
+    update.message.reply_text("Hello there 7u7 "+str(user.first_name))
+
+   
+
+    updater.dispatcher.remove_handler(RegexHandler("soyastroteco", password))
+
+
 def button(bot, update):
     
    
@@ -266,6 +307,7 @@ updater.dispatcher.add_handler(RegexHandler("Algo interesante", algo))
 updater.dispatcher.add_handler(RegexHandler("No hace nada", opcion))
 updater.dispatcher.add_handler(RegexHandler("Optical Character Recognition", OCR))
 updater.dispatcher.add_handler(RegexHandler("Contacto",contact))
+updater.dispatcher.add_handler(RegexHandler("soyastroteco", password))
 updater.dispatcher.add_handler(RegexHandler("Chao", bye))
 
 updater.dispatcher.add_handler(CallbackQueryHandler(button))
