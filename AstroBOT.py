@@ -55,14 +55,6 @@ def inicio(bot, update):
 
         ##password = "soyastroteco"
 
-        updater.dispatcher.add_handler(RegexHandler("soyastroteco", password)) ## Escucha la contraseña
-
-
-
-
-    
-    #bot.sendMessage(chat_id=id_usuario, text= "Marque una opción del teclado: ", reply_markup=reply_markup)
-
     print("\n")
 
     
@@ -133,6 +125,7 @@ def build_menu(buttons, n_cols, header_buttons=None, footer_buttons=None):
 
 
 def password(bot, update):
+
     id_usuario = update.message.chat_id
     user = update.message.from_user
     connection = sqlite3.connect('database.db')
@@ -140,13 +133,12 @@ def password(bot, update):
     cursor.execute('insert into WhiteList values ({ID})'.format(ID=id_usuario))
     connection.commit()
     connection.close()
-    update.message.reply_text("Hello there 7u7 "+str(user.first_name))
 
-   
+    update.message.reply_text("Hello there 7u7 "+str(user.first_name)) ## Admitido en AstroTEC
 
-    updater.dispatcher.remove_handler(RegexHandler("soyastroteco", password))
+    updater.dispatcher.remove_handler(RegexHandler("soyastroteco", password)) ## deja de escuchar la password
 
-    inicio(bot,update)
+    inicio(bot,update) ## Remite al menú principal
 
 
 def button(bot, update):
@@ -179,31 +171,18 @@ def bye(bot, update):
     update.message.reply_text(emoji.emojize('¡Pura vida! :punch:', use_aliases=True), reply_markup=ReplyKeyboardRemove())
 
     print("\n")
-    
-def hello(bot,update):
-
-    id_usuario = update.message.chat_id
-    user = update.message.from_user
-
-    teclado = [["Un saludo al bot"], ["Contacto"+emoji.emojize(':v:',  use_aliases=True)], ["¿Y cómo estuvo su dia?", "¿Cómo hizo esto?"],  [
-            "No hace nada", "Algo interesante"], ["Optical Character Recognition", "Chao"]]
-    reply_markup = ReplyKeyboardMarkup(teclado, resize_keyboard=True)
-
-    bot.sendMessage(chat_id=id_usuario, text="¡Hola!"+" "+user.first_name +" (Si ocupás ayuda presiona \help)\n\nMarque una opción del teclado: ", reply_markup=reply_markup)
-
 
 #Clasificadores
 
 updater.dispatcher.add_handler(CommandHandler("start", inicio))
-
 updater.dispatcher.add_handler(CommandHandler("help", aiuda))
 
 updater.dispatcher.add_handler(RegexHandler("Un saludo al bot", saludo))
 updater.dispatcher.add_handler(RegexHandler("Contacto",contact))
-
-updater.dispatcher.add_handler(RegexHandler("soyastroteco", password))
 updater.dispatcher.add_handler(RegexHandler("Chao", bye))
-updater.dispatcher.add_handler(RegexHandler("Hello", hello))
+
+updater.dispatcher.add_handler(RegexHandler("soyastroteco", password)) ## password listener
+
 
 updater.dispatcher.add_handler(CallbackQueryHandler(button))
 listener_handler = MessageHandler(Filters.text, listener)
