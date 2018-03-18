@@ -1,0 +1,1 @@
+updater.dispatcher.remove_handler(RegexHandler("hola", done))

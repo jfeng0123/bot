@@ -56,10 +56,15 @@ def inicio(bot, update):
 def password(bot, update):
 
     user = update.message.from_user
+    updater = Updater("468841366:AAGKTrEggcwACcglDlw6Zuj98KzsMq5Kqck")
 
+    update.message.reply_text("¡Listo! ya ha sido agregado")
     update.message.reply_text("Hello there 7u7 "+str(user.first_name))
 
-    updater.dispatcher.remove_handler(RegexHandler("soyastroteco", done))
+    ## Código para agregar a una persona a la whiteList
+
+    
+    updater.dispatcher.remove_handler(RegexHandler("hola", done))
 
                          
 def button(bot, update):
@@ -78,9 +83,6 @@ def done(bot, update):
 #Clasificadores
 
 updater.dispatcher.add_handler(CommandHandler("start", inicio))
-
-updater.dispatcher.add_handler(CallbackQueryHandler(button))
-
 updater.dispatcher.add_handler(RegexHandler("soyastroteco", password))
 
 updater.start_polling()
