@@ -3,7 +3,6 @@
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, RegexHandler, CallbackQueryHandler
 from telegram import ReplyKeyboardMarkup, ReplyMarkup, ReplyKeyboardRemove, User, Update, InlineKeyboardButton, InlineKeyboardMarkup
 
-
 import emoji
 
 import sqlite3
@@ -29,16 +28,20 @@ def inicio(bot, update):
     user = update.message.from_user
 
     connection = sqlite3.connect('database.db')
+    connection.row_factory = lambda cursor, row:row[0]
     cursor = connection.cursor()
 
     cursor.execute('SELECT ID FROM {table}'.format(table='WhiteList'))
+
     All_Names = cursor.fetchall()
     WhiteList = []
     for name in All_Names:
         print(name)
         WhiteList.append(name)
     print(WhiteList)
+
     if id_usuario in WhiteList:
+
         teclado = [["Un saludo al bot"], ["Contacto"+emoji.emojize(':v:',  use_aliases=True)], ["¿Y cómo estuvo su dia?", "¿Cómo hizo esto?"],  [
             "No hace nada", "Algo interesante"], ["Optical Character Recognition", "Chao"]]
         reply_markup = ReplyKeyboardMarkup(teclado, resize_keyboard=True)
@@ -258,6 +261,8 @@ def password(bot, update):
 
     updater.dispatcher.remove_handler(RegexHandler("soyastroteco", password))
 
+    inicio(bot,update)
+
 
 def button(bot, update):
     
@@ -290,7 +295,18 @@ def bye(bot, update):
 
     print("\n")
     
-       
+def hello(bot,update):
+
+    id_usuario = update.message.chat_id
+    user = update.message.from_user
+
+    teclado = [["Un saludo al bot"], ["Contacto"+emoji.emojize(':v:',  use_aliases=True)], ["¿Y cómo estuvo su dia?", "¿Cómo hizo esto?"],  [
+            "No hace nada", "Algo interesante"], ["Optical Character Recognition", "Chao"]]
+    reply_markup = ReplyKeyboardMarkup(teclado, resize_keyboard=True)
+
+    bot.sendMessage(chat_id=id_usuario, text="¡Hola!"+" "+user.first_name +" (Si ocupás ayuda presiona \help)\n\nMarque una opción del teclado: ", reply_markup=reply_markup)
+
+
 #Clasificadores
 
 updater.dispatcher.add_handler(CommandHandler("start", inicio))
@@ -309,6 +325,7 @@ updater.dispatcher.add_handler(RegexHandler("Optical Character Recognition", OCR
 updater.dispatcher.add_handler(RegexHandler("Contacto",contact))
 updater.dispatcher.add_handler(RegexHandler("soyastroteco", password))
 updater.dispatcher.add_handler(RegexHandler("Chao", bye))
+updater.dispatcher.add_handler(RegexHandler("Hello", hello))
 
 updater.dispatcher.add_handler(CallbackQueryHandler(button))
 listener_handler = MessageHandler(Filters.text, listener)
