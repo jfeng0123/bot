@@ -1,1 +1,1 @@
-worker: python AstroBOT.py
+web: python AstroBOT.py $PORT
