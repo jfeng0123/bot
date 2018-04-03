@@ -1,1 +1,1 @@
-web: (python -m http.server $PORT &) && (python AstroBOT.py)
+bot: python AstroBOT.py
