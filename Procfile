@@ -1,1 +1,1 @@
-bot: python AstroBOT.py
+worker: python AstroBOT.py
